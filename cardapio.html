@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio - Burger Franca</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 15px; }
+        .header { background-color: #ea1d2c; color: white; padding: 20px; text-align: center; border-radius: 0 0 15px 15px; margin: -15px -15px 20px -15px; }
+        .produto-card { background-color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .produto-info h3 { margin: 0 0 5px 0; color: #333; }
+        .produto-info p { margin: 0; color: #777; font-size: 14px; }
+        .preco { color: #2e7d32; font-weight: bold; margin-top: 5px; }
+        .btn-add { background-color: #ea1d2c; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Burger Franca</h2>
+        <p>Os melhores lanches da cidade</p>
+    </div>
+
+    <div class="produto-card">
+        <div class="produto-info">
+            <h3>01. X-Franca Clássico</h3>
+            <p>Hambúrguer 150g, muito queijo, maionese artesanal e pão brioche.</p>
+            <div class="preco">R$ 25,00</div>
+        </div>
+        <button class="btn-add" onclick="alert('X-Franca adicionado!')">+</button>
+    </div>
+
+    <div class="produto-card">
+        <div class="produto-info">
+            <h3>02. Batata Especial</h3>
+            <p>Porção individual de batata frita crocante com cheddar.</p>
+            <div class="preco">R$ 15,00</div>
+        </div>
+        <button class="btn-add" onclick="alert('Batata adicionada!')">+</button>
+    </div>
+</body>
+</html>
