@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seja Parceiro - Franca Delivery</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f6; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .box { background-color: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); width: 100%; max-width: 450px; box-sizing: border-box; text-align: center; }
+        h2 { color: #ea1d2c; margin: 0 0 10px 0; }
+        .barra-passos { display: flex; justify-content: space-between; margin-bottom: 25px; position: relative; }
+        .linha { position: absolute; top: 15px; left: 0; height: 4px; background-color: #eee; width: 100%; z-index: 1; }
+        .barra-progresso { position: absolute; top: 15px; left: 0; height: 4px; background-color: #25d366; width: 0%; z-index: 2; transition: 0.3s; }
+        .circulo { width: 34px; height: 34px; background-color: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #888; z-index: 3; transition: 0.3s; }
+        .circulo.ativo { background-color: #25d366; color: white; }
+        .step { display: none; text-align: left; }
+        .step.ativo { display: block; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        .btn { background-color: #ea1d2c; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .btn:hover { background-color: #b81420; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>Credenciamento de Loja</h2>
+        <p style="color:#666; font-size:14px; margin-bottom:20px;" id="sub-texto">Passo 1: Dados de Contato do Responsável</p>
+
+        <div class="barra-passos">
+            <div class="linha"></div>
+            <div class="barra-progresso" id="barra"></div>
+            <div class="circulo ativo" id="c1">1</div>
+            <div class="circulo" id="c2">2</div>
+            <div class="circulo" id="c3">3</div>
+            <div class="circulo" id="c4">4</div>
+        </div>
+
+        <!-- PASSO 1 -->
+        <div id="p1" class="step ativo">
+            <input type="text" id="nomeResp" placeholder="Nome do Responsável Legal">
+            <input type="email" id="emailLoja" placeholder="E-mail Comercial">
+            <input type="tel" id="telLoja" placeholder="WhatsApp da Loja">
+            <button class="btn" onclick="avancar(1, 25, 'Passo 2: Dados do Estabelecimento')">Próximo Passo</button>
+        </div>
+
+        <!-- PASSO 2 -->
+        <div id="p2" class="step">
+            <input type="text" id="cnpj" placeholder="CNPJ da Empresa (ou CPF para autônomos)">
+            <input type="text" id="nomeFantasia" placeholder="Nome Fantasia do Restaurante">
+            <input type="text" id="cnae" placeholder="CNAE (Ex: Comercialização de Alimentos)">
+            <button class="btn" onclick="avancar(2, 50, 'Passo 3: Endereço e Logística de Entrega')">Próximo Passo</button>
+        </div>
+
+        <!-- PASSO 3 -->
+        <div id="p3" class="step">
+            <input type="text" id="endLoja" placeholder="Endereço Completo da Loja">
+            <select id="logistica">
+                <option value="Propria">Usar meus entregadores próprios</option>
+                <option value="Plataforma">Usar os motoboys do Franca Delivery</option>
+            </select>
+            <button class="btn" onclick="avancar(3, 100, 'Passo 4: Configuração de Dados Bancários')">Próximo Passo</button>
+        </div>
+
+        <!-- PASSO 4 -->
+        <div id="p4" class="step">
+            <input type="text" id="titular" placeholder="Titular da Conta (Mesmo CPF/CNPJ do passo 2)">
+            <input type="text" id="banco" placeholder="Nome do Banco e Agência">
+            <input type="text" id="conta" placeholder="Número da Conta Corrente ou Poupança">
+            <button class="btn" style="background-color:#25d366;" onclick="finalizarCadastroLoja()">Enviar para Aprovação</button>
+        </div>
+    </div>
+
+    <script>
+        function avancar(passoAtual, porcentagem, texto) {
+            document.getElementById('p' + passoAtual).classList.remove('ativo');
+            document.getElementById('p' + (passoAtual + 1)).classList.add('ativo');
+            document.getElementById('c' + (passoAtual + 1)).classList.add('ativo');
+            document.getElementById('barra').style.width = porcentagem + '%';
+            document.getElementById('sub-texto').innerText = texto;
+        }
+
+        function finalizarCadastroLoja() {
+            alert("Cadastro enviado com sucesso! Nossa equipe analisará seu CNAE e titularidade bancária em até 24 horas.");
+            window.location.href = "painel.html"; // Joga para a área de ativação Pix de R$ 200
+        }
+    </script>
+</body>
+</html>

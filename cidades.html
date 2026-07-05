@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Franca Delivery</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; padding-bottom: 80px; }
+        .app-header { background-color: #ea1d2c; color: white; padding: 15px; text-align: center; font-weight: bold; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+        .container { max-width: 500px; margin: 60px auto 0 auto; padding: 15px; box-sizing: border-box; }
+        .app-aba-conteudo { display: none; }
+        .app-aba-conteudo.ativa { display: block; }
+
+        /* LISTA DE LOJAS E CATEGORIAS */
+        .categorias-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .categoria-card { background-color: white; padding: 12px 5px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer; font-size: 12px; font-weight: bold; color: #333; }
+        .loja-linha { background-color: white; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); cursor: pointer; }
+        .loja-logo-falsa { width: 50px; height: 50px; background-color: #f2f2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .loja-detalhes { flex: 1; }
+        .loja-detalhes h4 { margin: 0 0 4px 0; color: #333; }
+        .loja-detalhes p { margin: 0; font-size: 12px; color: #777; }
+
+        /* NOVO CARRINHO PROFISSIONAL DENTRO DA TELA DO CLIENTE */
+        .secao-carrinho { background-color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); margin-bottom: 15px; text-align: left; }
+        .secao-carrinho h3 { margin: 0 0 15px 0; font-size: 16px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .item-carrinho { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+        .img-mini { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; background-color: #eee; }
+        .item-carrinho-info { flex: 1; }
+        .item-carrinho-info h5 { margin: 0; font-size: 14px; color: #333; }
+        .item-carrinho-info span { font-size: 11px; color: #999; display: block; margin-top: 2px; }
+        .contador-bloco { display: flex; align-items: center; gap: 8px; }
+        .btn-cont { background-color: #f2f2f2; border: none; width: 26px; height: 26px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        
+        .bloco-flex { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 8px; }
+        .btn-trocar { background: none; border: none; color: #ea1d2c; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .input-cupom { width: 65%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+        .btn-cupom { width: 30%; background-color: #333; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        
+        .resumo-valores { border-top: 1px dashed #eee; margin-top: 15px; padding-top: 12px; }
+        .total-linha { font-size: 18px; font-weight: bold; color: #333; margin-top: 5px; }
+        .verde-txt { color: #2e7d32; font-weight: bold; }
+        
+        .btn-checkout { background-color: #ea1d2c; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; text-align: center; }
+        
+        /* PERFIL E SEJA PARCEIRO */
+        .btn-parceiro { background-gradient: linear-gradient(135deg, #ff4d4d, #ea1d2c); background-color: #ea1d2c; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .perfil-bloco { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); margin-bottom: 15px; text-align: left; }
+        
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; max-width: 500px; margin: 0 auto; }
+        .nav-item { background: none; border: none; color: #777; font-size: 11px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; width: 100%; }
+        .nav-item.ativo { color: #ea1d2c; }
+    </style>
+</head>
+<body>
+
+    <div class="app-header" id="titulo-topo">Franca Delivery</div>
+
+    <div class="container">
+
+        <!-- ================= ABA 1: HOME ================= -->
+        <div id="aba-home" class="app-aba-conteudo ativa">
+            <div class="categorias-grid">
+                <div class="categoria-card" onclick="alert('Filtrando Lanches')">🍔<br>Lanches</div>
+                <div class="categoria-card" onclick="alert('Filtrando Pizzas')">🍕<br>Pizzas</div>
+                <div class="categoria-card" onclick="alert('Filtrando Mercado')">🛒<br>Mercado</div>
+                <div class="categoria-card" onclick="window.location.href='site_parceiro.html'">📈<br>Vender Aqui</div>
+            </div>
+
+            <!-- REGRA DE NEGÓCIO: ADICIONAR COM TRAVA DE RESTAURANTE ÚNICO -->
+            <div style="font-size:16px; color:#333; margin:15px 0 10px 0; font-weight:bold;">Restaurantes em Franca</div>
+            
+            <div class="loja-linha" onclick="adicionarComTrava('Burger Franca', '01. X-Franca Clássico', 25.00)">
+                <div class="loja-logo-falsa">🍔</div>
+                <div class="loja-detalhes">
+                    <h4>Burger Franca</h4>
+                    <p>Clique para simular adição: <b>X-Franca (R$ 25,00)</b></p>
+                </div>
+            </div>
+
+            <div class="loja-linha" onclick="adicionarComTrava('Pizzaria Estrela', '01. Pizza Calabresa', 40.00)">
+                <div class="loja-logo-falsa">🍕</div>
+                <div class="loja-detalhes">
+                    <h4>Pizzaria Estrela</h4>
+                    <p>Clique para simular adição: <b>Pizza Calabresa (R$ 40,00)</b></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ABA 2: BUSCA (Vazia para navegação) ================= -->
+        <div id="aba-busca" class="app-aba-conteudo">
+            <p style="text-align:center; color:#777; margin-top:40px;">Tela de Pesquisa Avançada</p>
+        </div>
+
+        <!-- ================= ABA 3: NOVO CARRINHO (ESTRUTURA COMPLETA) ================= -->
+        <div id="aba-pedidos" class="app-aba-conteudo">
+            
+            <!-- 1. Itens Selecionados -->
+            <div class="secao-carrinho">
+                <h3 id="carrinho-loja-nome">Carrinho Vazio</h3>
+                <div id="lista-itens-checkout">
+                    <p style="color:#888; text-align:center; margin:10px 0;">Nenhum prato selecionado</p>
+                </div>
+            </div>
+
+            <!-- 2. Endereço de Entrega -->
+            <div class="secao-carrinho">
+                <h3>📍 Endereço de Entrega</h3>
+                <div class="bloco-flex">
+                    <div>
+                        <b id="txt-local">🏠 Casa</b>
+                        <span style="display:block; font-size:13px; color:#666;" id="txt-rua">Rua das Flores, 123 - Centro, Franca</span>
+                    </div>
+                    <button class="btn-trocar" onclick="trocarEnderecoCheckout()">Trocar</button>
+                </div>
+            </div>
+
+            <!-- 3. Forma de Pagamento e Cupons -->
+            <div class="secao-carrinho">
+                <h3>💳 Pagamento & Cupom</h3>
+                <div class="bloco-flex" style="margin-bottom: 15px;">
+                    <span id="txt-pagamento">💳 Cartão MasterCard final 4321</span>
+                    <button class="btn-trocar" onclick="alterarPagamentoCheckout()">Mudar</button>
+                </div>
+                
+                <div class="bloco-flex">
+                    <input type="text" id="cupomInput" class="input-cupom" placeholder="Digite o Cupom (FRANCA5)">
+                    <button class="btn-cupom" onclick="aplicarCupomCheckout()">Aplicar</button>
+                </div>
+            </div>
+
+            <!-- 4. Resumo de Valores -->
+            <div class="secao-carrinho resumo-valores">
+                <div class="bloco-flex"><span>Subtotal:</span><span>R$ <span id="v-subtotal">0,00</span></span></div>
+                <div class="bloco-flex"><span>Taxa de Entrega:</span><span id="v-frete" class="verde-txt">Grátis</span></div>
+                <div class="bloco-flex"><span>Descontos:</span><span class="verde-txt">- R$ <span id="v-desconto">0,00</span></span></div>
+                <div class="bloco-flex total-linha"><span>Total:</span><span>R$ <span id="v-total">0,00</span></span></div>
+            </div>
+
+            <!-- 5. Botão Fixo de Ação Principal com Trava de Segurança -->
+            <button class="btn-checkout" onclick="executarCheckoutPrincipal()">Fazer Pedido Obrigatório</button>
+        </div>
+
+        <!-- ================= ABA 4: PERFIL ================= -->
+        <div id="aba-perfil" class="app-aba-conteudo">
+            <div class="perfil-bloco">
+                <h3>👤 Meus Dados Pessoais</h3>
+                <p>Nome: <b>Jhonatan Junior</b></p>
+                <p>E-mail: <b>jhonatan@teste.com</b></p>
+                <p>CPF (Seguro): <b>444.***.***-00</b></p>
+            </div>
+
+            <!-- ESTRATÉGIA 1: BOTÃO COMERCIAL GIGANTE NO PERFIL -->
+            <button class="btn-parceiro" onclick="window.location.href='site_parceiro.html'">
+                        <!-- ESTRATÉGIA 1: BOTÃO COMERCIAL GIGANTE NO PERFIL -->
+            <div class="perfil-bloco" style="border: 2px dashed #ea1d2c; background-color: #fff8f8; text-align: center;">
+                <h3>📈 Seja um Parceiro Comercial</h3>
+                <p style="font-size:13px; color:#666; margin-bottom:15px;">Cadastre sua lanchonete e venda com TAXA ZERO por pedido!</p>
+                <button class="btn-salvar" style="background-color:#ea1d2c; margin:0;" onclick="window.location.href='site_parceiro.html'">
+                    🤝 Cadastrar Meu Restaurante (Adesão R$ 200)
+                </button>
+            </div>
+
+            <!-- 2. Endereços Salvos -->
+            <div class="perfil-bloco">
+                <h3>📍 Endereços Salvos</h3>
+                <div style="font-size:14px; margin-bottom:10px;">🏠 <b>Casa</b> - Rua das Flores, 123 (Padrão) <span style="color:#ea1d2c; font-size:12px; margin-left:10px; cursor:pointer;" onclick="alert('Endereço removido')">[Excluir]</span></div>
+                <div style="font-size:14px; margin-bottom:15px;">🏢 <b>Trabalho</b> - Av. Major Nicácio, 450 <span style="color:#ea1d2c; font-size:12px; margin-left:10px; cursor:pointer;" onclick="alert('Endereço removido')">[Excluir]</span></div>
+                <button class="btn-salvar" style="background-color:#333;" onclick="alert('Definindo endereço como padrão...')">Gerenciar Endereços</button>
+            </div>
+
+            <!-- 3. Formas de Pagamento (Seguro) -->
+            <div class="perfil-bloco">
+                <h3>💳 Formas de Pagamento</h3>
+                <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:10px;">
+                    <span>🔴 MasterCard final **** 4321</span>
+                    <span style="color:#ea1d2c; cursor:pointer;" onclick="alert('Cartão removido com sucesso!')">Excluir</span>
+                </div>
+                <p style="font-size:11px; color:#999; margin:0;">🔒 Dados completos e CVV nunca são salvos por segurança.</p>
+            </div>
+
+            <!-- 4. Cupons e Descontos -->
+            <div class="perfil-bloco">
+                <h3>🎟️ Meus Cupons Disponíveis</h3>
+                <div style="font-size:14px; color:#2e7d32; font-weight:bold;">• FRANCA5 (R$ 5,00 Ativo)</div>
+            </div>
+
+            <!-- 5. Segurança e Suporte (Obrigatório por Lei) -->
+            <div class="perfil-bloco">
+                <h3>🔒 Segurança e Suporte</h3>
+                <button class="btn-salvar" style="background-color:#555;" onclick="alert('Link de redefinição enviado para o e-mail.')">Alterar Senha de Acesso</button>
+                <button class="btn-perigo" onclick="let c = confirm('Excluir conta permanentemente com base na LGPD?'); if(c) { alert('Dados excluídos. Voltando ao início.'); window.location.href='login.html'; }">⚠️ EXCLUIR CONTA (LGPD)</button>
+            </div>
+        </div>
+
+    </div> <!-- Fim div container -->
+
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR FIXA (ESTILO IFOOD) -->
+    <div class="bottom-nav">
+        <button class="nav-item ativo" onclick="navegarAba('aba-home', this, 'Franca Delivery')"><span class="nav-icone">🏠</span>Início</button>
+        <button class="nav-item" onclick="navegarAba('aba-busca', this, 'Pesquisar')"><span class="nav-icone">🔍</span>Busca</button>
+        <button class="nav-item" onclick="navegarAba('aba-pedidos', this, 'Acompanhar Pedidos')"><span class="nav-icone">📋</span>Pedidos</button>
+        <button class="nav-item" onclick="navegarAba('aba-perfil', this, 'Minha Conta')"><span class="nav-icone">👤</span>Perfil</button>
+    </div>
+
+    <!-- JAVASCRIPT: INTELIGÊNCIA DE NAVEGAÇÃO E SISTEMAS -->
+    <script>
+        // Função de troca de Abas inferiores
+        function navegarAba(idAba, botaoClicado, tituloTopo) {
+            const conteudos = document.getElementsByClassName('app-aba-conteudo');
+            for(let i=0; i<conteudos.length; i++) { conteudos[i].classList.remove('ativa'); }
+
+            const botoes = document.getElementsByClassName('nav-item');
+            for(let i=0; i<botoes.length; i++) { botoes[i].classList.remove('ativo'); }
+
+            document.getElementById(idAba).classList.add('ativa');
+            botaoClicado.classList.add('ativo');
+            document.getElementById('titulo-topo').innerText = tituloTopo;
+        }
+
+        // Sistema de busca em tempo real da aba Busca
+        function sistemaBuscaReal() {
+            const busca = document.getElementById('inputPesquisa').value.toLowerCase();
+            const resultados = document.getElementById('resultados-busca');
+            
+            if(busca.includes('burg') || busca.includes('lanche')) {
+                resultados.innerHTML = `
+                    <div class="loja-linha" onclick="window.location.href='cardapio.html'">
+                        <div class="loja-logo-falsa">🍔</div>
+                        <div class="loja-detalhes"><h4>Burger Franca</h4><p>Lanches • Encontrado</p></div>
+                    </div>`;
+            } else if(busca.includes('piz') || busca.includes('estre')) {
+                resultados.innerHTML = `
+                    <div class="loja-linha">
+                        <div class="loja-logo-falsa">🍕</div>
+                        <div class="loja-detalhes"><h4>Pizzaria Estrela</h4><p>Pizzas • Encontrado</p></div>
+                    </div>`;
+            } else if (busca === "") {
+                resultados.innerHTML = '';
+            } else {
+                resultados.innerHTML = '<p style="color:#777; font-size:14px; text-align:center; margin-top:20px;">Nenhum restaurante encontrado.</p>';
+            }
+        }
+
+        // Clique nas buscas recentes ou categorias populares da aba Busca
+        function clicarHistorico(termo) {
+            document.getElementById('inputPesquisa').value = termo;
+            sistemaBuscaReal();
+        }
+
+        // Filtro por categorias ou tags da tela Inicial
+        function filtrarFiltro(nomeFiltro) {
+            alert("Aplicando filtro de buscas: " + nomeFiltro);
+        }
+    </script>
+</body>
+</html>

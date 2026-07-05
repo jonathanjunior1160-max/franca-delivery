@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O que deseja fazer? - Franca Delivery</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { background-color: white; padding: 40px 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); text-align: center; max-width: 450px; width: 90%; }
+        h1 { color: #333; margin-top: 0; font-size: 24px; }
+        p { color: #666; margin-bottom: 30px; font-size: 15px; }
+        
+        .opcao-bloco {
+            background-color: #f9f9fa;
+            border: 2px solid #eee;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .opcao-bloco:hover { border-color: #ea1d2c; background-color: #fff8f8; }
+        .icone { font-size: 32px; }
+        .info h3 { margin: 0 0 5px 0; color: #ea1d2c; font-size: 18px; }
+        .info p { margin: 0; font-size: 13px; color: #777; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Seja bem-vindo ao Franca Delivery!</h1>
+        <p>Escolha como você deseja navegar na nossa plataforma hoje:</p>
+
+        <!-- OPÇÃO 1: COMER ALGO -->
+        <div class="opcao-bloco" onclick="window.location.href='cidades.html'">
+            <div class="icone">🍔</div>
+            <div class="info">
+                <h3>Quero Comer Algo</h3>
+                <p>Ver os restaurantes disponíveis na região de Franca e fazer um pedido rápido.</p>
+            </div>
+        </div>
+
+        <!-- OPÇÃO 2: ABRIR LOJA -->
+        <div class="opcao-bloco" onclick="window.location.href='painel.html'">
+            <div class="icone">📈</div>
+            <div class="info">
+                <h3>Quero Abrir Minha Loja</h3>
+                <p>Cadastrar seu estabelecimento, ver planos de adesão e gerenciar seu cardápio digital.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

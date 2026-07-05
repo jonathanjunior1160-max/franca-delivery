@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Parceiro - Franca Delivery</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* INTERFACE COM ABAS FLUIDAS */
+        .sidebar {
+            background-color: #ffffff;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            top: 0;
+            z-index: 100;
+        }
+        .aba-btn {
+            background: none;
+            border: none;
+            padding: 15px 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .aba-btn.ativa {
+            color: #ea1d2c;
+            border-bottom: 3px solid #ea1d2c;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 70px auto 20px auto; /* Espaço por causa da barra fixa no topo */
+            padding: 15px;
+        }
+        
+        .conteudo-aba {
+            display: none;
+        }
+        .conteudo-aba.ativa {
+            display: block;
+        }
+
+        /* COMPONENTES PROFISSIONAIS */
+        .card-status {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-status h2 { margin: 0; font-size: 20px; color: #333; }
+        .btn-toggle {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-toggle.fechado { background-color: #777; }
+
+        .cards-financeiro {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .mini-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .mini-card p { margin: 0 0 5px 0; color: #888; font-size: 13px; text-transform: uppercase; }
+        .mini-card .valor { font-size: 22px; font-weight: bold; color: #333; }
+        .mini-card .valor.verde { color: #2e7d32; }
+
+        .lista-itens {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .lista-itens h3 { margin: 0 0 15px 0; font-size: 18px; color: #333; }
+        
+        .item-linha {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .item-linha:last-child { border-bottom: none; }
+        .item-nome { font-weight: 500; color: #444; }
+        .input-preco {
+            width: 70px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* TELA DE BLOQUEIO DE PAGAMENTO (TAXA DE ADESÃO) */
+        .bloqueio-tela {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f4f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .box-contrato {
+            background-color: white;
+            padding: 35px 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .box-contrato h2 { color: #ea1d2c; margin-top: 0; font-size: 24px; }
+        .box-contrato ul { text-align: left; color: #555; line-height: 1.6; margin: 20px 0; padding-left: 20px; }
+        .preco-adesao { font-size: 36px; font-weight: bold; color: #2e7d32; margin: 15px 0; }
+        .btn-contratar { background-color: #25d366; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; }
+
+        .info-plano {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PASSO 1: TELA DE ADESÃO (R$ 200 PRA LIBERAR O APP) -->
+    <div class="bloqueio-tela" id="telaCobranca">
+        <div class="box-contrato">
+            <h2>Seja Parceiro Franca Delivery</h2>
+            <p style="color: #666; font-size: 14px;">Abra sua loja na maior plataforma de entregas automatizada via WhatsApp da região!</p>
+            
+            <ul>
+                <li>🚀 Pedidos caem direto no seu WhatsApp</li>
+                <li>💵 <b>ZERO TAXAS</b> por venda (Lucro 100% seu)</li>
+                <li>📲 Painel exclusivo para mudar preços na hora</li>
+            </ul>
+
+            <p style="margin-bottom: 5px; color: #555; font-weight: bold; font-size: 14px;">Taxa única de ativação:</p>
+            <div class="preco-adesao">R$ 200,00</div>
+            <p style="font-size: 12px; color: #999; margin: 0 0 20px 0;">+ Mensalidade fixa de R$ 99,90/mês</p>
+
+            <button class="btn-contratar" onclick="ativarPainelComPix()">
+                Aceitar Termos e Ativar via PIX
+            </button>
+        </div>
+    </div>
+
+    <!-- BARRA DE ABAS COM INTERFACE DE ALTO NÍVEL -->
+    <div class="sidebar">
+        <button class="aba-btn ativa" onclick="trocarAba('aba-geral', this)">Visão Geral</button>
+        <button class="aba-btn" onclick="trocarAba('aba-cardapio', this)">Cardápio</button>
+        <button class="aba-btn" onclick="trocarAba('aba-financeiro', this)">Meu Plano</button>
+    </div>
+
+    <!-- CONTEÚDO DO PAINEL -->
+    <div class="container">
+        
+        <!-- ABA 1: VISÃO GERAL -->
+        <div id="aba-geral" class="conteudo-aba ativa">
+            <div class="card-status">
+                <div>
+                    <h2 id="status-texto" style="color: #25d366;">Loja Aberta</h2>
+                    <span style="color: #888; font-size: 13px;">Burger Franca</span>
+                </div>
+                <button id="status-btn" class="btn-toggle" onclick="alternarLoja()">Fechar Loja</button>
+            </div>
+
+            <div class="cards-financeiro">
+                <div class="mini-card">
+                    <p>Pedidos hoje</p>
+                    <div class="valor">14</div>
+                </div>
+                <div class="mini-card">
+                    <p>Faturamento</p>
+                    <div class="valor verde">R$ 412,00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 2: GERENCIAR CARDÁPIO -->
+        <div id="aba-cardapio" class="conteudo-aba">
+            <div class="lista-itens">
+                <h3>Preços do Cardápio</h3>
+                
+                <div class="item-linha">
+                    <span class="item-nome">01. X-Franca Clássico</span>
+                    <input type="number" class="input-preco" value="25.00" onchange="alert('Preço do X-Franca alterado!')">
+                </div>
+                
+                <div class="item-linha">
+                    <span class="item-nome">02. Batata Especial</span>
+                    <input type="number" class="input-preco" value="15.00" onchange="alert('Preço da Batata alterado!')">
+                </div>
+                
+                <div class="item-linha">
+                    <span class="item-nome">03. Coca-Cola Lata</span>
+                    <input type="number" class="input-preco" value="6.00" onchange="alert('Preço da Coca alterado!')">
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: INFORMAÇÕES DO PLANO -->
+        <div id="aba-financeiro" class="conteudo-aba">
+            <div class="info-plano">
+                <h3 style="margin-top: 0; color: #333;">Sua Assinatura</h3>
+                <p>Status: <span style="color: #2e7d32; font-weight: bold;">ATIVO (Taxa paga)</span></p>
+                <p>Mensalidade Atual: <b>R$ 99,90 / mês</b></p>
+                <p>Vencimento da Mensalidade: <b>Daqui a 30 dias</b></p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <p style="font-size: 13px; color: #666; margin: 0;">Plataforma gerenciada por: <b>Jhonatan Enterprise</b></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE NAVEGAÇÃO E LOGICA -->
+    <script>
+        // Função de pagamento Pix que libera a tela
+        function ativarPainelComPix() {
+            alert("Aguardando confirmação do Pix de R$ 200,00...");
+            alert("Sucesso! Pagamento identificado. Seu painel foi liberado!");
+            document.getElementById('telaCobranca').style.display = 'none';
+        }
+
+        // SISTEMA DE TROCA DE ABAS DO PASSO 1
+        function trocarAba(idDaAba, botaoClicado) {
+            // Esconde todas as abas de conteúdo
+            const conteudos = document.getElementsByClassName('conteudo-aba');
+            for(let i = 0; i < conteudos.length; i++) {
+                conteudos[i].classList.remove('ativa');
+            }
+            
+           
+                    // Tira a linha vermelha de todos os botões do menu
+            const botoes = document.getElementsByClassName('aba-btn');
+            for(let i = 0; i < botoes.length; i++) {
+                botoes[i].classList.remove('ativa');
+            }
+
+            // Ativa apenas a aba e o botão que você clicou
+            document.getElementById(idDaAba).classList.add('ativa');
+            botaoClicado.classList.add('ativa');
+        }
+
+        // Lógica de abrir/fechar loja
+        let aberta = true;
+        function alternarLoja() {
+            const txt = document.getElementById('status-texto');
+            const btn = document.getElementById('status-btn');
+            
+            if(aberta) {
+                aberta = false;
+                txt.innerText = "Loja Fechada"; 
+                txt.style.color = "#777";
+                btn.innerText = "Abrir Loja"; 
+                btn.className = "btn-toggle fechado";
+            } else {
+                aberta = true;
+                txt.innerText = "Loja Aberta"; 
+                txt.style.color = "#25d366";
+                btn.innerText = "Fechar Loja"; 
+                btn.className = "btn-toggle";
+            }
+        }
+    </script>
+</body>
+</html>

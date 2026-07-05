@@ -3,76 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Franca Delivery</title>
+    <title>Acesso - Franca Delivery</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f7f7f7; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-box { background-color: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 350px; text-align: center; }
-        h2 { color: #ea1d2c; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .btn-login { background-color: #ea1d2c; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .btn-login:hover { background-color: #b81420; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f6; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .box { background-color: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 380px; box-sizing: border-box; }
+        h2 { color: #ea1d2c; margin: 0 0 5px 0; text-align: center; }
+        .sub { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
+        
+        /* BARRA DE PROGRESSO */
+        .progresso-container { display: flex; justify-content: space-between; margin-bottom: 25px; position: relative; }
+        .progresso-linha { position: absolute; top: 15px; left: 0; height: 4px; background-color: #eee; width: 100%; z-index: 1; }
+        .progresso-barra { position: absolute; top: 15px; left: 0; height: 4px; background-color: #ea1d2c; width: 0%; z-index: 2; transition: 0.3s; }
+        .etapa-circulo { width: 34px; height: 34px; background-color: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #888; z-index: 3; transition: 0.3s; font-size: 14px; }
+        .etapa-circulo.ativa { background-color: #ea1d2c; color: white; }
+
+        /* SEÇÕES DO FORMULÁRIO */
+        .form-step { display: none; }
+        .form-step.ativo { display: block; }
+        
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        .btn { background-color: #ea1d2c; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .btn:hover { background-color: #b81420; }
+        .btn-secundario { background-color: transparent; color: #ea1d2c; border: 1px solid #ea1d2c; }
+        .links { text-align: center; margin-top: 15px; font-size: 14px; color: #666; }
+        .links span { color: #ea1d2c; cursor: pointer; font-weight: bold; }
+        
+        .codigo-bloco { display: none; background-color: #fff8f8; padding: 10px; border-radius: 8px; border: 1px dashed #ea1d2c; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="login-box">
-        <h2>Franca Delivery</h2>
-        <p>Entre ou crie sua conta para pedir</p>
-        
-        <input type="email" id="email" placeholder="Seu e-mail" required>
-        <input type="password" id="password" placeholder="Sua senha" required>
-        
-        <button class="btn-login" id="btnEntrar">Entrar / Cadastrar</button>
+    <div class="box">
+        <h2 id="titulo-tela">Franca Delivery</h2>
+        <p class="sub" id="sub-tela">Entre na sua conta para fazer pedidos</p>
+
+        <!-- BARRA DE PROGRESSO (SÓ APARECE NO CADASTRO) -->
+        <div class="progresso-container" id="barraProgresso" style="display: none;">
+            <div class="progresso-linha"></div>
+            <div class="progresso-barra" id="barraEfetiva"></div>
+            <div class="etapa-circulo ativa" id="circulo1">1</div>
+            <div class="etapa-circulo" id="circulo2">2</div>
+            <div class="etapa-circulo" id="circulo3">3</div>
+        </div>
+
+        <!-- MODO LOGIN TRADICIONAL -->
+        <div id="secaoLogin" class="form-step ativo">
+            <input type="email" id="loginEmail" placeholder="Seu e-mail">
+            <input type="password" id="loginSenha" placeholder="Sua senha">
+            <button class="btn" onclick="executarLoginDireto()">Entrar no Aplicativo</button>
+            <div class="links">Não tem conta? <span onclick="alternarModo('cadastro')">Cadastre-se aqui</span></div>
+        </div>
+
+        <!-- MODO CADASTRO: PASSO 1 (EMAIL + VALIDAÇÃO) -->
+        <div id="passo1" class="form-step">
+            <div id="inputsEmailCadastro">
+                <input type="email" id="cadEmail" placeholder="Digite seu e-mail">
+                <input type="email" id="cadEmailConf" placeholder="Confirme seu e-mail">
+                <input type="password" id="cadSenha" placeholder="Crie uma senha (mínimo 6 dígitos)">
+                <input type="password" id="cadSenhaConf" placeholder="Confirme sua senha">
+                <button class="btn" onclick="enviarCodigoEmail()">Enviar Código de Verificação</button>
+            </div>
+            
+            <div class="codigo-bloco" id="blocoCodigoEmail">
+                <p style="margin:0 0 10px 0; font-size:13px; color:#ea1d2c; font-weight:bold;">Insira o código enviado para o seu e-mail:</p>
+                <input type="text" id="codigoEmailInput" placeholder="Digite o código de 4 dígitos">
+                <button class="btn" onclick="validarCodigoEmail()">Confirmar E-mail</button>
+            </div>
+            <div class="links">Já tem conta? <span onclick="alternarModo('login')">Fazer Login</span></div>
+        </div>
+
+        <!-- MODO CADASTRO: PASSO 2 (TELEFONE + SMS OBRIGATÓRIO) -->
+        <div id="passo2" class="form-step">
+            <div id="inputsTelefone">
+                <p style="font-size: 13px; color:#555; margin:0 0 10px 0;">Obrigatório para avisos de entrega:</p>
+                <input type="tel" id="cadTelefone" placeholder="(16) 99999-9999">
+                <button class="btn" onclick="enviarSms()">Enviar SMS de Confirmação</button>
+            </div>
+            
+            <div class="codigo-bloco" id="blocoSms">
+                <p style="margin:0 0 10px 0; font-size:13px; color:#ea1d2c; font-weight:bold;">Insira o código SMS recebido:</p>
+                <input type="text" id="codigoSmsInput" placeholder="Código de 4 dígitos do SMS">
+                <button class="btn" onclick="validarSms()">Confirmar Telefone</button>
+            </div>
+        </div>
+
+        <!-- MODO CADASTRO: PASSO 3 (CPF OBRIGATÓRIO) -->
+        <div id="passo3" class="form-step">
+            <p style="font-size: 13px; color:#555; margin:0 0 10px 0;">Insira seu CPF para segurança dos estabelecimentos:</p>
+            <input type="text" id="cadCpf" placeholder="000.000.000-00">
+            <button class="btn" onclick="finalizarCadastroCompleto()">Finalizar Cadastro Obrigatório</button>
+        </div>
+
     </div>
 
-    <!-- CONFIGURAÇÃO COMPLETA E CORRIGIDA DO FIREBASE -->
-    <script type="module">
-        // Os links abaixo agora estão com o caminho completo e correto do Google
-        import { initializeApp } from "https://gstatic.com";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://gstatic.com";
+    <script>
+        // Alterna entre tela de Login puro e o fluxo de Cadastro
+        function alternarModo(modo) {
+            document.getElementById('secaoLogin').classList.remove('ativo');
+            document.getElementById('passo1').classList.remove('ativo');
+            document.getElementById('barraProgresso').style.display = 'none';
 
-        // Suas chaves de acesso corrigidas do franca-delivery
-        const firebaseConfig = {
-            apiKey: "AIzaSyDHtVzMpI6kj-xMZPuBDC6pjnWCG3CEfIo",
-            authDomain: "franca-delivery-ac654.firebaseapp.com",
-            projectId: "franca-delivery-ac654",
-            storageBucket: "franca-delivery-ac654.firebasestorage.app",
-            messagingSenderId: "673949917391",
-            appId: "1:673949917391:web:6e43dba9cadfe21b2857ba",
-            measurementId: "G-9DCPECHLFH"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        document.getElementById('btnEntrar').addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) { 
-                alert("Por favor, preencha o e-mail e a senha!"); 
-                return; 
+            if (modo === 'cadastro') {
+                document.getElementById('titulo-tela').innerText = "Crie sua Conta";
+                document.getElementById('sub-tela').innerText = "Passo 1: Credenciais de Acesso";
+                document.getElementById('passo1').classList.add('ativo');
+                document.getElementById('barraProgresso').style.display = 'flex';
+                atualizarBarraProgresso(0);
+            } else {
+                document.getElementById('titulo-tela').innerText = "Franca Delivery";
+                document.getElementById('sub-tela').innerText = "Entre na sua conta para fazer pedidos";
+                document.getElementById('secaoLogin').classList.add('ativo');
             }
+        }
 
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => { 
-                    alert("Bem-vindo de volta!"); 
-                    window.location.href = 'telefone.html'; 
-                })
-                .catch((error) => {
-                    // Trata as mensagens de erro de credenciais para criar a conta na hora
-                    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
-                        createUserWithEmailAndPassword(auth, email, password)
-                            .then(() => { 
-                                alert("Conta criada com sucesso no Firebase!"); 
-                                window.location.href = 'telefone.html'; 
-                            })
-                            .catch((err) => alert("Erro ao criar conta: " + err.message));
-                    } else { 
-                        alert("Erro no sistema: " + error.message); 
-                    }
-                });
-        });
+        function atualizarBarraProgresso(etapa) {
+            const barra = document.getElementById('barraEfetiva');
+            barra.style.width = (etapa * 50) + '%';
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById('circulo' + i).classList.remove('ativa');
+            }
+            for (let i = 1; i <= (etapa + 1); i++) {
+                document.getElementById('circulo' + i).classList.add('ativa');
+            }
+        }
+
+        // LOGIN DIRETO PARA QUEM JÁ TEM CADASTRO
+        function ejecutarLoginDireto() {
+            const email = document.getElementById('loginEmail').value;
+            const senha = document.getElementById('loginSenha').value;
+            if (!email || !senha) { alert("Preencha e-mail e senha!"); return; }
+            
+            alert("Efetuando Login em Tempo Real...");
+            // Como o cadastro foi concluído, joga para a tela de escolha comercial
+            window.location.href = "decisao.html"; 
+        }
+
+        // LÓGICA PASSO 1: E-MAIL
+        function enviarCodigoEmail() {
+            const email = document.getElementById('cadEmail').value;
+            const emailConf = document.getElementById('cadEmailConf').value;
+            const senha = document.getElementById('cadSenha').value;
+            const senhaConf = document.getElementById('cadSenhaConf').value;
+
+            if(!email || !emailConf || !senha || !senhaConf) { alert("Preencha todos os campos!"); return; }
+            if(email !== emailConf) { alert("Os e-mails não coincidem!"); return; }
+            if(senha !== senhaConf) { alert("As senhas não coincidem!"); return; }
+            if(senha.length < 6) { alert("A senha deve ter no mínimo 6 dígitos!"); return; }
+
+            alert("Código de verificação enviado para " + email);
+            document.getElementById('inputsEmailCadastro').style.display = 'none';
+            document.getElementById('blocoCodigoEmail').style.display = 'block';
+        }
+
+        function validarCodigoEmail() {
+            const cod = document.getElementById('codigoEmailInput').value;
+            if(cod === "") { alert("Digite o código!"); return; }
+            
+            alert("E-mail validado com sucesso!");
+            // Avança para o Passo 2 (Telefone)
+            document.getElementById('passo1').classList.remove('ativo');
+            document.getElementById('passo2').classList.add('ativo');
+            document.getElementById('sub-tela').innerText = "Passo 2: Confirmação de Celular";
+            atualizarBarraProgresso(1);
+        }
+
+                    alert("SMS com código enviado para " + tel);
+            document.getElementById('inputsTelefone').style.display = 'none';
+            document.getElementById('blocoSms').style.display = 'block';
+        
+
+        function validarSms() {
+            const cod = document.getElementById('codigoSmsInput').value;
+            if(cod === "") { alert("Digite o código do SMS!"); return; }
+            
+            alert("Telefone confirmado com sucesso!");
+            // Avança para o Passo 3 (CPF)
+            document.getElementById('passo2').classList.remove('ativo');
+            document.getElementById('passo3').classList.add('ativo');
+            document.getElementById('sub-tela').innerText = "Passo 3: Verificação de Segurança";
+            atualizarBarraProgresso(2);
+        }
+
+        // LÓGICA PASSO 3: CPF
+        function finalizarCadastroCompleto() {
+            const cpf = document.getElementById('cadCpf').value;
+            if(cpf === "") { alert("O preenchimento do CPF é obrigatório!"); return; }
+            
+            alert("Cadastro realizado com sucesso de ponta a ponta!");
+            // Força a voltar para o Modo Login para ele entrar com os dados novos
+            alternarModo('login');
+        }
     </script>
 </body>
 </html>

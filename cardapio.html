@@ -3,39 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio - Burger Franca</title>
+    <title>Burger Franca</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 15px; }
-        .header { background-color: #ea1d2c; color: white; padding: 20px; text-align: center; border-radius: 0 0 15px 15px; margin: -15px -15px 20px -15px; }
-        .produto-card { background-color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .produto-info h3 { margin: 0 0 5px 0; color: #333; }
-        .produto-info p { margin: 0; color: #777; font-size: 14px; }
-        .preco { color: #2e7d32; font-weight: bold; margin-top: 5px; }
-        .btn-add { background-color: #ea1d2c; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; padding-bottom: 280px; }
+        .header { background-color: #ea1d2c; color: white; padding: 25px 15px; text-align: center; }
+        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+        
+        .produto-card { background-color: white; padding: 12px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 15px; }
+        .produto-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; }
+        .produto-info { flex: 1; }
+        .produto-info h3 { margin: 0 0 4px 0; font-size: 15px; color: #333; }
+        .produto-info p { margin: 0; font-size: 12px; color: #777; }
+        .preco { color: #2e7d32; font-weight: bold; margin-top: 5px; font-size: 14px; }
+        .btn-add { background-color: #ea1d2c; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; }
+
+        /* SEÇÃO FINAL DO CHECKOUT FIXO */
+        .checkout-fixo { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; box-shadow: 0 -4px 15px rgba(0,0,0,0.08); padding: 15px; max-width: 500px; margin: 0 auto; border-radius: 16px 16px 0 0; box-sizing: border-box; }
+        .endereco-linha { display: flex; justify-content: space-between; font-size: 13px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
+        .valores-resumo { font-size: 13px; color: #666; line-height: 1.6; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
+        .valores-resumo div { display: flex; justify-content: space-between; }
+        .total-linha { font-size: 16px; font-weight: bold; color: #333; margin-top: 4px; }
+        
+        .cupom-input { width: 65%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+        .btn-cupom { width: 30%; background-color: #333; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .btn-checkout { background-color: #ea1d2c; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
+
     <div class="header">
         <h2>Burger Franca</h2>
-        <p>Os melhores lanches da cidade</p>
+        <p style="margin:5px 0 0 0; font-size:12px; opacity:0.9;">Hambúrgueres Artesanais</p>
     </div>
 
-    <div class="produto-card">
-        <div class="produto-info">
-            <h3>01. X-Franca Clássico</h3>
-            <p>Hambúrguer 150g, muito queijo, maionese artesanal e pão brioche.</p>
-            <div class="preco">R$ 25,00</div>
+    <div class="container">
+        <!-- Itens da Loja -->
+        <div class="produto-card">
+            <img class="produto-img" src="https://unsplash.com" alt="Burger">
+            <div class="produto-info">
+                <h3>X-Franca Clássico</h3>
+                <p>Blend 150g, muito queijo e maionese da casa.</p>
+                <div class="preco">R$ 25,00</div>
+            </div>
+            <button class="btn-add" onclick="adicionar('X-Franca Clássico', 25.00)">+</button>
         </div>
-        <button class="btn-add" onclick="alert('X-Franca adicionado!')">+</button>
+
+        <div class="produto-card">
+            <img class="produto-img" src="https://unsplash.com" alt="Batata">
+            <div class="produto-info">
+                <h3>Batata Especial</h3>
+                <p>Batata frita crocante com cheddar e bacon.</p>
+                <div class="preco">R$ 15,00</div>
+            </div>
+            <button class="btn-add" onclick="adicionar('Batata Especial', 15.00)">+</button>
+        </div>
     </div>
 
-    <div class="produto-card">
-        <div class="produto-info">
-            <h3>02. Batata Especial</h3>
-            <p>Porção individual de batata frita crocante com cheddar.</p>
-            <div class="preco">R$ 15,00</div>
+    <!-- PAINEL DE CHECKOUT ESTILO IFOOD -->
+    <div class="checkout-fixo">
+        <div class="endereco-linha">
+            <span>📍 Entregar em: <b id="end-atual">Rua das Flores, 123</b></span>
+            <span style="color:#ea1d2c; font-weight:bold; cursor:pointer;" onclick="trocarEndereco()">Trocar</span>
         </div>
-        <button class="btn-add" onclick="alert('Batata adicionada!')">+</button>
+
+        <div style="margin-bottom: 8px; display:flex; justify-content:space-between;">
+            <input type="text" id="cupomText" class="cupom-input" placeholder="Digite seu cupom (Ex: FRANCA5)">
+            <button class="btn-cupom" onclick="aplicarCupom()">Aplicar</button>
+        </div>
+
+        <div class="valores-resumo">
+            <div><span>Subtotal:</span><span>R$ <span id="sub">0,00</span></span></div>
+            <div><span>Taxa de Entrega:</span><span style="color:#2e7d32; font-weight:bold;" id="taxa">Grátis</span></div>
+            <div style="color:#2e7d32; display:none;" id="linha-desconto"><span>Desconto do Cupom:</span><span>- R$ <span id="desc">0,00</span></span></div>
+            <div class="total-linha"><span>Total:</span><span>R$ <span id="total">0,00</span></span></div>
+        </div>
+
+        <button class="btn-checkout" onclick="fazerPedidoFinal()">Fazer Pedido</button>
     </div>
+
+    <script>
+        let subtotal = 0;
+        let desconto = 0;
+        let itens = {};
+        let lojaAtualNoCarrinho = "Burger Franca"; // Simulação de controle de Carrinho Único
+
+        function adicionar(nome, preco) {
+            // Regra do Carrinho Único
+            let confirmacaoLoja = true;
+            if(localStorage.getItem('lojaNoCarrinho') && localStorage.getItem('lojaNoCarrinho') !== lojaAtualNoCarrinho) {
+                confirmacaoLoja = confirm("Você já tem itens de outro restaurante no carrinho. Deseja limpar o carrinho atual para adicionar este?");
+                if(confirmacaoLoja) { limparCarrinhoCompleto(); }
+            }
+
+            if(confirmacaoLoja) {
+                localStorage.setItem('lojaNoCarrinho', lojaAtualNoCarrinho);
+                subtotal += preco;
+                atualizarValores();
+                alert(nome + " adicionado ao seu pedido!");
+            }
+        }
+
+        function trocarEndereco() {
+            let novoEnd = prompt("Digite o novo endereço de entrega:");
+            if(novoEnd) {
+                document.getElementById('end-atual').innerText = novoEnd;
+                document.getElementById('taxa').innerText = "R$ 5,00";
+                document.getElementById('taxa').style.color = "#333";
+                atualizarValores();
+            }
+        }
+
+        function aplicarCupom() {
+            let cp = document.getElementById('cupomText').value.toUpperCase();
+            if(cp === "FRANCA5") {
+                desconto = 5.00;
+                document.getElementById('linha-desconto').style.display = 'flex';
+                atualizarValores();
+                alert("🎟️ Cupom de R$ 5,00 aplicado com sucesso!");
+            } else { alert("Cupom inválido!"); }
+        }
+
+        function atualizarValores() {
+            let tEntrega = document.getElementById('taxa').innerText === "Grátis" ? 0 : 5.00;
+            let valorFinal = (subtotal + tEntrega) - desconto;
+            if(valorFinal < 0) valorFinal = 0;
+
+            document.getElementById('sub').innerText = subtotal.toFixed(2).replace('.', ',');
+            document.getElementById('desc').innerText = desconto.toFixed(2).replace('.', ',');
+            document.getElementById('total').innerText = valorFinal.toFixed(2).replace('.', ',');
+        }
+
+        function limparCarrinhoCompleto() {
+            subtotal = 0; desconto = 0;
+            localStorage.removeItem('lojaNoCarrinho');
+            atualizarValores();
+        }
+
+        function fazerPedidoFinal() {
+            if(subtotal === 0) { alert("Seu carrinho está vazio!"); return; }
+            
+            // Regra de segurança: simula a checagem se o telefone ou CPF estão vazios
+            let telefonePreenchido = true; 
+            if(!telefonePreenchido) {
+                alert("🚨 Verificação Necessária: Por favor, complete seu Telefone e CPF na aba Perfil antes de fazer seu primeiro pedido!");
+                return;
+            }
+
+            let end = document.getElementById('end-atual').innerText;
+            let txt = `*NOVO PEDIDO - ${lojaAtualNoCarrinho}*\n\n`;
+            txt += `*Endereço:* ${end}\n`;
+            txt += `*Total Final:* R$ ${document.getElementById('total').innerText}\n\n`;
+            txt += `_Enviando dados via WhatsApp..._`;
+
+            window.location.href = `https://whatsapp.com{encodeURIComponent(txt)}`;
+        }
+    </script>
 </body>
 </html>
