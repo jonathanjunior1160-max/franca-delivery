@@ -35,23 +35,23 @@
             <div class="circulo" id="c4">4</div>
         </div>
 
-        <!-- PASSO 1 -->
+        <!-- ETAPA 1: CONTATO -->
         <div id="p1" class="step ativo">
             <input type="text" id="nomeResp" placeholder="Nome do Responsável Legal">
             <input type="email" id="emailLoja" placeholder="E-mail Comercial">
             <input type="tel" id="telLoja" placeholder="WhatsApp da Loja">
-            <button class="btn" onclick="avancar(1, 25, 'Passo 2: Dados do Estabelecimento')">Próximo Passo</button>
+            <button class="btn" onclick="avancar(1, 33, 'Passo 2: Dados do Estabelecimento')">Próximo Passo</button>
         </div>
 
-        <!-- PASSO 2 -->
+        <!-- ETAPA 2: DADOS DO NEGÓCIO -->
         <div id="p2" class="step">
             <input type="text" id="cnpj" placeholder="CNPJ da Empresa (ou CPF para autônomos)">
             <input type="text" id="nomeFantasia" placeholder="Nome Fantasia do Restaurante">
             <input type="text" id="cnae" placeholder="CNAE (Ex: Comercialização de Alimentos)">
-            <button class="btn" onclick="avancar(2, 50, 'Passo 3: Endereço e Logística de Entrega')">Próximo Passo</button>
+            <button class="btn" onclick="avancar(2, 66, 'Passo 3: Endereço e Logística de Entrega')">Próximo Passo</button>
         </div>
 
-        <!-- PASSO 3 -->
+        <!-- ETAPA 3: LOGÍSTICA -->
         <div id="p3" class="step">
             <input type="text" id="endLoja" placeholder="Endereço Completo da Loja">
             <select id="logistica">
@@ -61,7 +61,7 @@
             <button class="btn" onclick="avancar(3, 100, 'Passo 4: Configuração de Dados Bancários')">Próximo Passo</button>
         </div>
 
-        <!-- PASSO 4 -->
+        <!-- ETAPA 4: BANCO COM VALIDAÇÃO DE TITULARIDADE -->
         <div id="p4" class="step">
             <input type="text" id="titular" placeholder="Titular da Conta (Mesmo CPF/CNPJ do passo 2)">
             <input type="text" id="banco" placeholder="Nome do Banco e Agência">
@@ -80,8 +80,8 @@
         }
 
         function finalizarCadastroLoja() {
-            alert("Cadastro enviado com sucesso! Nossa equipe analisará seu CNAE e titularidade bancária em até 24 horas.");
-            window.location.href = "painel.html"; // Joga para a área de ativação Pix de R$ 200
+            alert("Cadastro enviado com sucesso! Nossa equipe analisará seu CNAE e a titularidade bancária da conta em até 24 horas.");
+            window.location.href = "painel.html"; // Redireciona para o painel de cobrança de R$ 200
         }
     </script>
 </body>

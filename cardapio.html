@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burger Franca</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; padding-bottom: 280px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; padding-bottom: 300px; }
         .header { background-color: #ea1d2c; color: white; padding: 25px 15px; text-align: center; }
         .container { max-width: 500px; margin: 0 auto; padding: 15px; }
         
@@ -17,7 +17,13 @@
         .preco { color: #2e7d32; font-weight: bold; margin-top: 5px; font-size: 14px; }
         .btn-add { background-color: #ea1d2c; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; }
 
-        /* SEÇÃO FINAL DO CHECKOUT FIXO */
+        /* LISTA DE ITENS DENTRO DO CARRINHO (NOVO) */
+        .carrinho-itens-lista { max-height: 80px; overflow-y: auto; font-size: 13px; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+        .item-carrinho-linha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .controles-qtd { display: flex; align-items: center; gap: 8px; }
+        .btn-qtd { background-color: #eee; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* PAINEL DE CHECKOUT FIXO */
         .checkout-fixo { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; box-shadow: 0 -4px 15px rgba(0,0,0,0.08); padding: 15px; max-width: 500px; margin: 0 auto; border-radius: 16px 16px 0 0; box-sizing: border-box; }
         .endereco-linha { display: flex; justify-content: space-between; font-size: 13px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
         .valores-resumo { font-size: 13px; color: #666; line-height: 1.6; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
@@ -37,7 +43,6 @@
     </div>
 
     <div class="container">
-        <!-- Itens da Loja -->
         <div class="produto-card">
             <img class="produto-img" src="https://unsplash.com" alt="Burger">
             <div class="produto-info">
@@ -66,6 +71,11 @@
             <span style="color:#ea1d2c; font-weight:bold; cursor:pointer;" onclick="trocarEndereco()">Trocar</span>
         </div>
 
+        <!-- LISTA INTERATIVA DE PRODUTOS ADICIONADOS -->
+        <div class="carrinho-itens-lista" id="lista-carrinho-html">
+            <p style="color:#aaa; margin:5px 0; font-size:12px; text-align:center;">Nenhum lanche no carrinho</p>
+        </div>
+
         <div style="margin-bottom: 8px; display:flex; justify-content:space-between;">
             <input type="text" id="cupomText" class="cupom-input" placeholder="Digite seu cupom (Ex: FRANCA5)">
             <button class="btn-cupom" onclick="aplicarCupom()">Aplicar</button>
@@ -84,23 +94,69 @@
     <script>
         let subtotal = 0;
         let desconto = 0;
-        let itens = {};
-        let lojaAtualNoCarrinho = "Burger Franca"; // Simulação de controle de Carrinho Único
+        let carrinho = {}; // Guarda lanches e quantidades
+        let lojaAtualNoCarrinho = "Burger Franca"; // Controle de Carrinho Único
 
         function adicionar(nome, preco) {
-            // Regra do Carrinho Único
-            let confirmacaoLoja = true;
+            // REGRA DE NEGÓCIO IMPORTANTE: CARRINHO ÚNICO
             if(localStorage.getItem('lojaNoCarrinho') && localStorage.getItem('lojaNoCarrinho') !== lojaAtualNoCarrinho) {
-                confirmacaoLoja = confirm("Você já tem itens de outro restaurante no carrinho. Deseja limpar o carrinho atual para adicionar este?");
-                if(confirmacaoLoja) { limparCarrinhoCompleto(); }
+                let confLoja = confirm("Você já tem itens de outro restaurante no carrinho. Deseja limpar o carrinho atual para adicionar este?");
+                if(confLoja) { limparCarrinhoCompleto(); } else { return; }
             }
 
-            if(confirmacaoLoja) {
-                localStorage.setItem('lojaNoCarrinho', lojaAtualNoCarrinho);
-                subtotal += preco;
-                atualizarValores();
-                alert(nome + " adicionado ao seu pedido!");
+            localStorage.setItem('lojaNoCarrinho', lojaAtualNoCarrinho);
+
+            if (carrinho[nome]) {
+                carrinho[nome].qtd++;
+            } else {
+                carrinho[nome] = { preco: preco, qtd: 1 };
             }
+            
+            subtotal += preco;
+            renderizarCarrinho();
+        }
+
+        function alterarQtd(nome, mudança) {
+            if (!carrinho[nome]) return;
+
+            let preco = carrinho[nome].preco;
+            if (mudança === -1 && carrinho[nome].qtd === 1) {
+                delete carrinho[nome];
+                subtotal -= preco;
+            } else {
+                carrinho[nome].qtd += mudança;
+                subtotal += (preco * mudança);
+            }
+
+            // Se o carrinho esvaziou de vez, limpa a trava de loja
+            if (Object.keys(carrinho).length === 0) {
+                localStorage.removeItem('lojaNoCarrinho');
+            }
+
+            renderizarCarrinho();
+        }
+
+        function renderizarCarrinho() {
+            const listaHtml = document.getElementById('lista-carrinho-html');
+            
+            if (Object.keys(carrinho).length === 0) {
+                listaHtml.innerHTML = '<p style="color:#aaa; margin:5px 0; font-size:12px; text-align:center;">Nenhum lanche no carrinho</p>';
+                subtotal = 0;
+            } else {
+                listaHtml.innerHTML = '';
+                for (let nome in carrinho) {
+                    listaHtml.innerHTML += `
+                        <div class="item-carrinho-linha">
+                            <span>🍔 ${nome}</span>
+                            <div class="controles-qtd">
+                                <button class="btn-qtd" onclick="alterarQtd('${nome}', -1)">-</button>
+                                <b>${carrinho[nome].qtd}</b>
+                                <button class="btn-qtd" onclick="alterarQtd('${nome}', 1)">+</button>
+                            </div>
+                        </div>`;
+                }
+            }
+            atualizarValores();
         }
 
         function trocarEndereco() {
@@ -126,7 +182,7 @@
         function atualizarValores() {
             let tEntrega = document.getElementById('taxa').innerText === "Grátis" ? 0 : 5.00;
             let valorFinal = (subtotal + tEntrega) - desconto;
-            if(valorFinal < 0) valorFinal = 0;
+            if(valorFinal < 0 || subtotal === 0) valorFinal = 0;
 
             document.getElementById('sub').innerText = subtotal.toFixed(2).replace('.', ',');
             document.getElementById('desc').innerText = desconto.toFixed(2).replace('.', ',');
@@ -134,27 +190,41 @@
         }
 
         function limparCarrinhoCompleto() {
-            subtotal = 0; desconto = 0;
+            carrinho = {};
+                    carrinho = {};
+            subtotal = 0; 
+            desconto = 0;
             localStorage.removeItem('lojaNoCarrinho');
-            atualizarValores();
+            renderizarCarrinho();
         }
 
         function fazerPedidoFinal() {
-            if(subtotal === 0) { alert("Seu carrinho está vazio!"); return; }
+            if(subtotal === 0) { 
+                alert("Seu carrinho está vazio!"); 
+                return; 
+            }
             
-            // Regra de segurança: simula a checagem se o telefone ou CPF estão vazios
-            let telefonePreenchido = true; 
-            if(!telefonePreenchido) {
-                alert("🚨 Verificação Necessária: Por favor, complete seu Telefone e CPF na aba Perfil antes de fazer seu primeiro pedido!");
+            // Regra de segurança obrigatória contra fraudes de identidade
+            let cpfValidado = true; 
+            if(!cpfValidado) {
+                alert("🚨 Verificação Obrigatória: Complete seu cadastro com CPF na aba Perfil antes de finalizar!");
                 return;
             }
 
             let end = document.getElementById('end-atual').innerText;
-            let txt = `*NOVO PEDIDO - ${lojaAtualNoCarrinho}*\n\n`;
-            txt += `*Endereço:* ${end}\n`;
-            txt += `*Total Final:* R$ ${document.getElementById('total').innerText}\n\n`;
-            txt += `_Enviando dados via WhatsApp..._`;
+            let resumoItens = "";
+            
+            // Junta todos os itens adicionados no texto final
+            for (let nome in carrinho) {
+                resumoItens += `• ${carrinho[nome].qtd}x ${nome}\n`;
+            }
 
+            let txt = `*🍔 NOVO PEDIDO - ${lojaAtualNoCarrinho}*\n\n`;
+            txt += `${resumoItens}\n`;
+            txt += `*Endereço:* ${end}\n`;
+            txt += `*Total:* R$ ${document.getElementById('total').innerText}\n`;
+
+            // Dispara direto para o WhatsApp do restaurante parceiro
             window.location.href = `https://whatsapp.com{encodeURIComponent(txt)}`;
         }
     </script>
